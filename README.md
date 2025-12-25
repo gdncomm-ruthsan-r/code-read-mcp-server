@@ -5,173 +5,249 @@ An MCP (Model Context Protocol) server that connects to your GitHub repositories
 ## Features
 
 - 🔍 **Detect API Changes**: Compare branches/commits to find new or modified API endpoints
-- 📂 **Multi-Service Support**: Configure all 7 of your services with their automation repos
+- 📂 **Multi-Service Support**: Configure multiple services with their automation repos
 - 🔗 **GitHub Integration**: Fetch file contents, commits, PRs directly from GitHub
 - 📝 **Test Templates**: Get starter templates for REST, GraphQL, and gRPC APIs
 - 🤖 **Cursor Integration**: Provides tools that Cursor can use to understand your API changes
 
+## Configured Services
+
+This MCP server is configured for the following Bliklan services:
+
+| Service                     | Repository                          |
+| --------------------------- | ----------------------------------- |
+| bliklan-campaign-management | gdncomm/bliklan-campaign-management |
+| bliklan-tracker-aggregator  | gdncomm/bliklan-tracker-aggregator  |
+| bliklan-compute-engine      | gdncomm/bliklan-compute-engine      |
+| bliklan-credit              | gdncomm/bliklan-credit              |
+| bliklan-ads-engine          | gdncomm/bliklan-ads-engine          |
+
+---
+
 ## Prerequisites
 
-- Node.js 18+ 
-- npm or yarn
-- GitHub Personal Access Token with `repo` scope
-- Cursor IDE
+- **Node.js 18+** (we recommend using nvm)
+- **npm** (comes with Node.js)
+- **GitHub Fine-Grained Personal Access Token** (required for gdncomm org)
+- **Cursor IDE**
+
+### Check Your Node.js Version
+
+```bash
+node --version
+# Should be v18.x.x or higher (v20.x or v21.x recommended)
+```
+
+If you're using an older version, install a newer one via nvm:
+
+```bash
+nvm install 21
+nvm use 21
+nvm alias default 21
+```
+
+---
 
 ## Quick Start
 
-### 1. Install Dependencies
+### Step 1: Clone the Repository
 
 ```bash
-cd ~/api-test-mcp-server
+git clone <repository-url>
+cd api-test-mcp-server
+```
+
+### Step 2: Install Dependencies
+
+```bash
 npm install
 ```
 
-### 2. Build the Server
+### Step 3: Build the Server
 
 ```bash
 npm run build
 ```
 
-### 3. Configure Your Services
+This creates the `dist/index.js` file that Cursor will run.
 
-Create a `config.json` file based on the example:
+### Step 4: Create a GitHub Fine-Grained Token
 
-```bash
-cp config.example.json config.json
-```
+⚠️ **Important**: The `gdncomm` organization requires a **fine-grained personal access token** (classic tokens won't work).
 
-Edit `config.json` with your actual service details:
+1. Go to: https://github.com/settings/tokens?type=beta
+2. Click **"Generate new token"**
+3. Configure:
+   - **Token name**: `api-test-mcp-server`
+   - **Expiration**: Choose appropriate duration
+   - **Resource owner**: Select `gdncomm` organization
+   - **Repository access**: Select "Only select repositories" → choose the repos you need
+   - **Permissions** (Repository permissions):
+     - **Contents**: Read-only
+     - **Metadata**: Read-only
+     - **Pull requests**: Read-only
+     - **Commit statuses**: Read-only
+4. Click **Generate token**
+5. Copy the token (starts with `github_pat_`)
 
-```json
-{
-  "services": [
-    {
-      "name": "user-service",
-      "repoOwner": "your-github-org",
-      "repoName": "user-service-repo",
-      "automationRepoPath": "/Users/ruthsan/automation-repos/user-service",
-      "apiPatterns": [
-        "**/controllers/**",
-        "**/routes/**",
-        "**/api/**"
-      ]
-    }
-    // ... add all 7 services
-  ]
-}
-```
+### Step 5: Configure Cursor MCP
 
-### 4. Set Up GitHub Token
-
-Create a `.env` file:
-
-```bash
-cp .env.example .env
-```
-
-Edit `.env` and add your GitHub token:
-
-```
-GITHUB_TOKEN=ghp_your_actual_token_here
-DEFAULT_BASE_BRANCH=main
-```
-
-**Getting a GitHub Token:**
-1. Go to https://github.com/settings/tokens
-2. Click "Generate new token (classic)"
-3. Select scopes: `repo` (for private repos) or `public_repo` (for public repos only)
-4. Copy the generated token
-
-### 5. Configure Cursor MCP
-
-Open Cursor and go to: **Settings → Features → MCP Servers**
-
-Or manually edit `~/.cursor/mcp.json`:
+Create or edit `~/.cursor/mcp.json`:
 
 ```json
 {
   "mcpServers": {
     "api-test-server": {
-      "command": "node",
-      "args": ["/Users/ruthsan/api-test-mcp-server/dist/index.js"],
+      "command": "/path/to/your/node",
+      "args": ["/path/to/api-test-mcp-server/dist/index.js"],
       "env": {
-        "GITHUB_TOKEN": "ghp_your_token_here",
-        "DEFAULT_BASE_BRANCH": "main",
-        "SERVICES_CONFIG": "[{\"name\":\"user-service\",\"repoOwner\":\"your-org\",\"repoName\":\"user-service\",\"automationRepoPath\":\"/path/to/automation\",\"apiPatterns\":[\"**/controllers/**\",\"**/routes/**\"]}]"
+        "GITHUB_TOKEN": "github_pat_your_token_here",
+        "DEFAULT_BASE_BRANCH": "master",
+        "SERVICES_CONFIG": "[{\"name\":\"bliklan-campaign-management\",\"repoOwner\":\"gdncomm\",\"repoName\":\"bliklan-campaign-management\",\"automationRepoPath\":\"/Users/yourname/automation-repos/bliklan-campaign-management\",\"apiPatterns\":[\"**/controllers/**\",\"**/routes/**\",\"**/api/**\",\"**/*Controller*\",\"**/*Router*\"]},{\"name\":\"bliklan-tracker-aggregator\",\"repoOwner\":\"gdncomm\",\"repoName\":\"bliklan-tracker-aggregator\",\"automationRepoPath\":\"/Users/yourname/automation-repos/bliklan-tracker-aggregator\",\"apiPatterns\":[\"**/controllers/**\",\"**/routes/**\",\"**/api/**\",\"**/*Controller*\",\"**/*Router*\"]},{\"name\":\"bliklan-compute-engine\",\"repoOwner\":\"gdncomm\",\"repoName\":\"bliklan-compute-engine\",\"automationRepoPath\":\"/Users/yourname/automation-repos/bliklan-compute-engine\",\"apiPatterns\":[\"**/controllers/**\",\"**/routes/**\",\"**/api/**\",\"**/*Controller*\",\"**/*Router*\"]},{\"name\":\"bliklan-credit\",\"repoOwner\":\"gdncomm\",\"repoName\":\"bliklan-credit\",\"automationRepoPath\":\"/Users/yourname/automation-repos/bliklan-credit\",\"apiPatterns\":[\"**/controllers/**\",\"**/routes/**\",\"**/api/**\",\"**/*Controller*\",\"**/*Router*\"]},{\"name\":\"bliklan-ads-engine\",\"repoOwner\":\"gdncomm\",\"repoName\":\"bliklan-ads-engine\",\"automationRepoPath\":\"/Users/yourname/automation-repos/bliklan-ads-engine\",\"apiPatterns\":[\"**/controllers/**\",\"**/routes/**\",\"**/api/**\",\"**/*Controller*\",\"**/*Router*\"]}]"
       }
     }
   }
 }
 ```
 
-### 6. Restart Cursor
+#### Important: Find Your Node Path
 
-After configuring, restart Cursor for the MCP server to be loaded.
+If you're using **nvm**, you need to use the full path to node:
+
+```bash
+# Find your node path
+which node
+# Example output: /Users/yourname/.nvm/versions/node/v21.5.0/bin/node
+```
+
+Use this full path in the `"command"` field.
+
+#### Update Paths
+
+Replace in the config:
+
+- `/path/to/your/node` → Your actual node path (from `which node`)
+- `/path/to/api-test-mcp-server` → Where you cloned this repo
+- `/Users/yourname/automation-repos/` → Your actual automation repos path
+- `github_pat_your_token_here` → Your actual GitHub token
+
+### Step 6: Restart Cursor
+
+**Completely quit Cursor** (Cmd+Q on macOS) and reopen it. The MCP server only loads at startup.
+
+### Step 7: Verify Setup
+
+In Cursor, check **Settings → Features → MCP Servers**. You should see `api-test-server` with a green status.
+
+If you see a red status, check the error message:
+
+- **"Cannot use import statement outside a module"** → Wrong Node.js version (need 18+)
+- **"Service not found"** → SERVICES_CONFIG not set correctly
+- **"Bad credentials"** → GitHub token is invalid or expired
+
+---
 
 ## Available Tools
 
 Once configured, you can ask Cursor to use these tools:
 
-| Tool | Description |
-|------|-------------|
-| `list_services` | List all configured services |
-| `get_api_changes` | Get API changes between branches |
-| `get_api_details` | Get full content of an API file |
-| `get_recent_commits` | Get recent commits for a service |
-| `get_pull_requests` | Get PRs for a service |
-| `analyze_api_endpoint` | Extract endpoint definitions from a file |
-| `get_test_template` | Get a test template for REST/GraphQL/gRPC |
-| `compare_branches` | Compare branches and summarize changes |
+| Tool                   | Description                               | Example                                              |
+| ---------------------- | ----------------------------------------- | ---------------------------------------------------- |
+| `list_services`        | List all configured services              | "List all services"                                  |
+| `get_recent_commits`   | Get recent commits for a service          | "Get recent commits for bliklan-campaign-management" |
+| `get_api_changes`      | Get API changes between branches          | "Get API changes between master and feature/xyz"     |
+| `get_api_details`      | Get full content of an API file           | "Get the StoreAdsCampaignController.java file"       |
+| `get_pull_requests`    | Get PRs for a service                     | "Show open PRs for bliklan-credit"                   |
+| `analyze_api_endpoint` | Extract endpoint definitions from a file  | "Analyze endpoints in UserController.java"           |
+| `get_test_template`    | Get a test template for REST/GraphQL/gRPC | "Get a REST test template"                           |
+| `compare_branches`     | Compare branches and summarize changes    | "Compare master and release/SP22"                    |
+
+---
 
 ## Usage Examples
 
-### Example 1: Find API Changes and Generate Tests
-
-In Cursor, open your automation repo and ask:
+### Example 1: List Services and Get Recent Commits
 
 ```
-Using the api-test-server, find all API changes in the user-service 
-between main and feature/new-user-endpoints branch. 
-Then generate test cases for each new endpoint.
+Use the api-test-server to list services, then get recent commits for bliklan-campaign-management
 ```
 
-### Example 2: Analyze a Specific API File
+### Example 2: Find API Logic
 
 ```
-Use the MCP server to analyze the API endpoints in 
-src/controllers/UserController.ts in the user-service. 
-Generate comprehensive test cases for each endpoint.
+Use the api-test-server to find the logic for storeads/save-campaign API in bliklan-campaign-management
 ```
 
 ### Example 3: Check Recent Changes
 
 ```
-Show me the recent commits in order-service that might have API changes. 
-Then fetch the details of any modified API files.
+Get the recent commits for bliklan-credit service and show me any API-related changes
 ```
 
-### Example 4: Generate Tests from PR
+### Example 4: Analyze API File
 
 ```
-List the open PRs in payment-service. For the latest PR, 
-analyze the API changes and generate test cases.
+Use the MCP server to get the content of src/main/java/com/gdn/bliklan/campaignmanagement/controller/StoreAdsCampaignController.java from bliklan-campaign-management
 ```
 
-## Workflow for Automated Test Generation
+### Example 5: Compare Branches
 
-1. **Detect Changes**: Use `get_api_changes` or `compare_branches` to find new APIs
-2. **Analyze Endpoints**: Use `analyze_api_endpoint` to understand the API structure
-3. **Get Full Context**: Use `get_api_details` to read the complete API implementation
-4. **Generate Tests**: Cursor uses this context to write comprehensive test cases
-5. **Save to Automation Repo**: Tests are saved to your local automation repository
+```
+Compare master and release/SP22_RELEASE_01 branches in bliklan-campaign-management to find API changes
+```
 
-## Configuration Options
+---
 
-### API Patterns
+## Testing the MCP Server
+
+Simply ask Cursor to use the tools (this is the normal workflow).
+
+---
+
+### MCP Server Shows Red Status
+
+1. Check Cursor Developer Tools: **Help → Toggle Developer Tools → Console**
+2. Look for error messages related to "mcp" or "api-test-server"
+3. Verify the node path is correct (use full path from `which node`)
+4. Make sure the dist/index.js file exists (run `npm run build`)
+
+### No API Changes Detected
+
+1. Verify `apiPatterns` match your file structure
+2. Check if the branches you're comparing exist
+3. Try broader patterns like `**/*.java` for testing
+
+---
+
+## Adding New Services
+
+To add a new service, update the `SERVICES_CONFIG` in `~/.cursor/mcp.json`:
+
+```json
+{
+  "name": "new-service-name",
+  "repoOwner": "gdncomm",
+  "repoName": "new-service-repo",
+  "automationRepoPath": "/path/to/automation/new-service",
+  "apiPatterns": [
+    "**/controllers/**",
+    "**/routes/**",
+    "**/api/**",
+    "**/*Controller*"
+  ]
+}
+```
+
+Then restart Cursor.
+
+---
+
+## API Patterns
 
 Configure `apiPatterns` to match your codebase structure:
 
 **For Spring Boot (Java):**
+
 ```json
 "apiPatterns": [
   "**/controller/**",
@@ -180,56 +256,6 @@ Configure `apiPatterns` to match your codebase structure:
   "**/*Resource.java"
 ]
 ```
-
-**For Express.js (Node.js):**
-```json
-"apiPatterns": [
-  "**/routes/**",
-  "**/api/**",
-  "**/*.routes.ts",
-  "**/*.controller.ts"
-]
-```
-
-**For FastAPI (Python):**
-```json
-"apiPatterns": [
-  "**/routers/**",
-  "**/api/**",
-  "**/*_router.py",
-  "**/*_api.py"
-]
-```
-
-**For Go:**
-```json
-"apiPatterns": [
-  "**/handlers/**",
-  "**/api/**",
-  "**/*_handler.go",
-  "**/routes.go"
-]
-```
-
-## Troubleshooting
-
-### MCP Server not appearing in Cursor
-
-1. Check if the server builds correctly: `npm run build`
-2. Verify the path in `mcp.json` is absolute
-3. Check Cursor logs: **Help → Toggle Developer Tools → Console**
-
-### GitHub API Errors
-
-1. Verify your GitHub token is valid
-2. Check token has the required scopes (`repo` or `public_repo`)
-3. Ensure the repository names are correct
-
-### No API Changes Detected
-
-1. Verify `apiPatterns` match your file structure
-2. Check if the branches/commits you're comparing exist
-3. Try broader patterns like `**/*.ts` for testing
 
 ## Development
 
@@ -245,8 +271,26 @@ npm run dev
 npm run watch
 ```
 
-## License
+### Build
 
-MIT
+```bash
+npm run build
+```
 
+---
 
+## Project Structure
+
+```
+api-test-mcp-server/
+├── src/
+│   └── index.ts          # Main MCP server implementation
+├── dist/                  # Compiled JavaScript (generated)
+├── package.json           # Dependencies and scripts
+├── tsconfig.json          # TypeScript configuration
+├── cursor-mcp-config.json # Example Cursor MCP configuration
+├── config.example.json    # Example service configuration
+└── README.md              # This file
+```
+
+---
