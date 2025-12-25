@@ -223,6 +223,8 @@ Simply ask Cursor to use the tools (this is the normal workflow).
 
 To add a new service, update the `SERVICES_CONFIG` in `~/.cursor/mcp.json`:
 
+or copy the file cp /Users/ruthsan/api-test-mcp-server/cursor-mcp-config.json ~/.cursor/mcp.json
+
 ```json
 {
   "name": "new-service-name",
