@@ -1,4 +1,4 @@
-# Code Reader MCP Server
+# Code Reader - MCP Server
 
 An MCP (Model Context Protocol) server that connects to your GitHub repositories, detects API changes, and provides context for Cursor to automatically generate test cases.
 
