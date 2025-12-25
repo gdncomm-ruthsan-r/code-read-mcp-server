@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "api-test-server": {
+      "command": "node",
+      "args": ["dist/index.js"],
+      "env": {
+        "GITHUB_TOKEN": "your_github_token_here",
+        "DEFAULT_BASE_BRANCH": "master",
+        "SERVICES_CONFIG": "[{\"name\":\"bliklan-campaign-management\",\"repoOwner\":\"gdncomm\",\"repoName\":\"bliklan-campaign-management\",\"automationRepoPath\":\"/Users/ruthsan/automation-repos/bliklan-campaign-management\",\"apiPatterns\":[\"**/controllers/**\",\"**/routes/**\",\"**/api/**\",\"**/*Controller*\",\"**/*Router*\"]},{\"name\":\"bliklan-tracker-aggregator\",\"repoOwner\":\"gdncomm\",\"repoName\":\"bliklan-tracker-aggregator\",\"automationRepoPath\":\"/Users/ruthsan/automation-repos/bliklan-tracker-aggregator\",\"apiPatterns\":[\"**/controllers/**\",\"**/routes/**\",\"**/api/**\",\"**/*Controller*\",\"**/*Router*\"]},{\"name\":\"bliklan-compute-engine\",\"repoOwner\":\"gdncomm\",\"repoName\":\"bliklan-compute-engine\",\"automationRepoPath\":\"/Users/ruthsan/automation-repos/bliklan-compute-engine\",\"apiPatterns\":[\"**/controllers/**\",\"**/routes/**\",\"**/api/**\",\"**/*Controller*\",\"**/*Router*\"]},{\"name\":\"bliklan-credit\",\"repoOwner\":\"gdncomm\",\"repoName\":\"bliklan-credit\",\"automationRepoPath\":\"/Users/ruthsan/automation-repos/bliklan-credit\",\"apiPatterns\":[\"**/controllers/**\",\"**/routes/**\",\"**/api/**\",\"**/*Controller*\",\"**/*Router*\"]},{\"name\":\"bliklan-ads-engine\",\"repoOwner\":\"gdncomm\",\"repoName\":\"bliklan-ads-engine\",\"automationRepoPath\":\"/Users/ruthsan/automation-repos/bliklan-ads-engine\",\"apiPatterns\":[\"**/controllers/**\",\"**/routes/**\",\"**/api/**\",\"**/*Controller*\",\"**/*Router*\"]}]"
+      }
+    }
+  }
+}
